@@ -28,25 +28,39 @@ int main()
         int imgArray[100][100];
     } data;
 
-    vector<String> filenames;
+    vector<String> filenames, filenamespng;
     vector<vector<int>> labels;
     vector<ImageData> datas;
+    vector<int> label;
 
     // read image from file
     Mat img;
     String directory = "21pose/*.jpg";
+    String directorypng = "21pose/*.png";
+    string name;
 
     glob(directory, filenames);
+    glob(directorypng, filenamespng);
 
-    for(int a = 0; a < filenames.size(); a++){
-        img = imread(filenames[a],1);
-        if(!img.data){
-            cout << "No image" << endl;
-            return -1;
+    for(int a = 0; a < filenames.size() + filenamespng.size(); a++){
+        if(a < filenames.size()){
+            img = imread(filenames[a],1);
+            if(!img.data){
+                cout << "No image" << endl;
+                return -1;
+            }
+            name = (string)filenames[a].substr(7,filenames[a].length()-1);
+            label = getLabel(name);
+        }else{
+            img = imread(filenamespng[a-filenames.size()],1);
+            if(!img.data){
+                cout << "No image" << endl;
+                return -1;
+            }
+            name = (string)filenamespng[a-filenames.size()].substr(7,filenamespng[a-filenames.size()].length()-1);
+            label = getLabel(name);
         }
-        string name = (string)filenames[a].substr(7,filenames[a].length()-1);
-        vector<int> label = getLabel(name);
-        
+        cout << name;
         // Converting image from RGB into greyscale
         Mat grey;
         cvtColor( img, grey, CV_BGR2GRAY );
@@ -54,6 +68,8 @@ int main()
         // resizing image into 100x100
         Mat grey100;
         resize(grey, grey100, Size(100,100));
+        imshow("test", grey100);
+        waitKey(100);
         
         // converting Mat image into array
         for(int i = 0; i < grey100.rows; i++){
@@ -63,8 +79,9 @@ int main()
         }
         labels.push_back(label);
         datas.push_back(data);
-        cout << labels.size() << " " << datas.size() << endl;
+        cout << label[0] << " " << data.imgArray[0][0] << endl;
     }
+    cout << labels.size() << " " << datas.size() << endl;
     // float (*map5)[maxMap][maxMap];
     // float min = load;
     // float map6 = map5[0][0][0];
