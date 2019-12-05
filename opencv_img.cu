@@ -7,6 +7,7 @@
 #include <string>
 #include <dirent.h>
 #include "gabor.h"
+#include "convolution.h"
 
 using namespace std;
 using namespace cv;
@@ -22,12 +23,20 @@ vector<int> getLabel(string name){
     return labelarray;
 }
 
+double randZeroToOne()
+{
+    return rand() / (RAND_MAX + 1.);
+}
+
+struct ImageData { 
+    int imgArray[132][132];
+};
+
+void conv(ImageData, float[4][maxMap][maxMap]);
+
 int main()
 {
-    struct ImageData { 
-        int imgArray[100][100];
-    } data;
-
+    ImageData data;
     vector<String> filenames, filenamespng;
     vector<vector<int>> labels;
     vector<ImageData> datas;
@@ -60,7 +69,7 @@ int main()
             name = (string)filenamespng[a-filenames.size()].substr(7,filenamespng[a-filenames.size()].length()-1);
             label = getLabel(name);
         }
-        cout << name;
+        // cout << name;
         // Converting image from RGB into greyscale
         Mat grey;
         cvtColor( img, grey, CV_BGR2GRAY );
@@ -68,22 +77,61 @@ int main()
         // resizing image into 100x100
         Mat grey100;
         resize(grey, grey100, Size(100,100));
-        imshow("test", grey100);
-        waitKey(100);
+        // imshow("test", grey100);
+        // waitKey(1);
         
-        // converting Mat image into array
-        for(int i = 0; i < grey100.rows; i++){
-            for(int j = 0; j < grey100.cols; j++){
-                data.imgArray[i][j] = (int)grey100.at<uchar>(i,j);
+        // converting Mat image into array and add padding 16
+        for(int i = 0; i < 132; i++){
+            for(int j = 0; j < 132; j++){
+                data.imgArray[i][j] = 128;
+                if((i >= 16 && i < grey100.rows + 16) && (j >= 16 && j < grey100.cols + 16))
+                    data.imgArray[i][j] = (int)grey100.at<uchar>(i,j);
             }
         }
         labels.push_back(label);
         datas.push_back(data);
-        cout << label[0] << " " << data.imgArray[0][0] << endl;
+        // cout << label[0] << " " << data.imgArray[0][0] << endl;
     }
-    cout << labels.size() << " " << datas.size() << endl;
+    // cout << labels.size() << " " << datas.size() << endl;
     // float (*map5)[maxMap][maxMap];
     // float min = load;
     // float map6 = map5[0][0][0];
+
+    // Neural Network Start Here
+    double (*syn0)[1000] = new double[20000][1000];
+    double (*syn1)[22] = new double[1000][22];
+    double (*bias0)[1000] = new double[1][1000];
+    double (*bias1)[22] = new double[1][22];
+
+    for(int i = 0; i < 20000; i++)
+        for(int j = 0; j < 1000; j++)
+            syn0[i][j] = 2 * randZeroToOne() - 1;
+
+    for(int i = 0; i < 1000; i++)
+        for(int j = 0; j < 22; j++)
+            syn1[i][j] = 2 * randZeroToOne() - 1;
+
+    for(int i = 0; i < 1000; i++)
+        bias0[0][i] = 2 * randZeroToOne() - 1;
+
+    for(int i = 0; i < 22; i++)
+        bias1[0][i] = 2 * randZeroToOne() - 1;
+        
+    double learning_rate = 0.005;
+
+    // Training start here
+    
+    for(int i=0; i < 1000; i++){
+        conv(data, map33);
+        // convolution
+        // pooling
+        // magnitude
+        // phase
+        // Forwardprop
+        // BackProp
+        // update weight
+    }
+    // save to pickle
+
     return 0;
 }
