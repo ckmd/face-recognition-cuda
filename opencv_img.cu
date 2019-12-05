@@ -32,7 +32,7 @@ struct ImageData {
     int imgArray[132][132];
 };
 
-void conv(ImageData, float[4][maxMap][maxMap]);
+void *conv(ImageData, float[4][maxMap][maxMap]);
 
 int main()
 {
@@ -121,9 +121,17 @@ int main()
 
     // Training start here
     
-    for(int i=0; i < 1; i++){
-        (double (*)[maxMap][maxMap])conv(data, map33);
+    for(int i=0; i < datas.size(); i++){
         // convolution
+        double (*convolution)[100][100] = (double (*)[100][100])conv(datas[i], map33i);
+
+        // for(int j = 0; j < 4; j++){
+        //     Mat A(100,100,CV_64F);
+        //     memcpy(A.data, convolution[j], 100*100*sizeof(double));
+        //     imshow("test", A);
+        //     waitKey(250);
+        // }
+        cout << i << endl;
         // pooling
         // magnitude
         // phase

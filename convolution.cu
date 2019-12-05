@@ -44,7 +44,6 @@ void *conv(ImageData num, float filter[4][33][33]){
                 result[i][r-16][c-16] = sum;
                 // break;
             }
-            cout << r << endl;
             // break;
         }
         // break;
