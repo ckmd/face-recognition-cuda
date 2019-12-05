@@ -11,38 +11,41 @@
 using namespace std;
 using namespace cv;
 
-int * getLabel(string name){
-    static int labelarray[22] = { };
-    int label = stoi(name.substr(0, name.find(" ")));
-    for(int i=0; i<22; i++){
-        // Defining that is face
+vector<int> getLabel(string name){
+    vector<int> labelarray (22, 0);
+    string label = name.substr(0, name.find(" "));
+    if(label != "nonface"){
+    //     cout << "face" << label << endl;
         labelarray[0] = 1;
-        labelarray[label] = 1;
+        labelarray[stoi(label)] = 1;
     }
     return labelarray;
 }
 
 int main()
 {
+    struct ImageData { 
+        int imgArray[100][100];
+    } data;
+
+    vector<String> filenames;
+    vector<vector<int>> labels;
+    vector<ImageData> datas;
+
     // read image from file
     Mat img;
     String directory = "21pose/*.jpg";
-    vector<String> filenames;
-    glob(directory, filenames);
-    for(int a = 0; a < filenames.size(); a++){
 
-        // string fileName = "1 person03175+30+45 Cropped.jpg";
+    glob(directory, filenames);
+
+    for(int a = 0; a < filenames.size(); a++){
         img = imread(filenames[a],1);
         if(!img.data){
             cout << "No image" << endl;
             return -1;
         }
-        cout << filenames[a] << endl;
-        
-        // int *label = getLabel(fileName);
-        // for(int i = 0; i < 22; i++){
-        //     cout << *(label+i) << endl;
-        // }
+        string name = (string)filenames[a].substr(7,filenames[a].length()-1);
+        vector<int> label = getLabel(name);
         
         // Converting image from RGB into greyscale
         Mat grey;
@@ -53,23 +56,17 @@ int main()
         resize(grey, grey100, Size(100,100));
         
         // converting Mat image into array
-        int imgArray [100][100];
         for(int i = 0; i < grey100.rows; i++){
             for(int j = 0; j < grey100.cols; j++){
-                imgArray[i][j] = (int)grey100.at<uchar>(i,j);
+                data.imgArray[i][j] = (int)grey100.at<uchar>(i,j);
             }
         }
+        labels.push_back(label);
+        datas.push_back(data);
+        cout << labels.size() << " " << datas.size() << endl;
     }
     // float (*map5)[maxMap][maxMap];
     // float min = load;
     // float map6 = map5[0][0][0];
-    for(int k=0; k < 4; k++){
-        for (int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++)
-            cout << map5i[k][i][j] << "\t";
-            cout << endl;
-        }
-        cout << endl;
-    }
     return 0;
 }
