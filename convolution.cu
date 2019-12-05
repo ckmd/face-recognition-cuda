@@ -5,36 +5,50 @@ using namespace std;
 
 const int filterSize = 33;
 
-void conv(ImageData num, float filter[4][33][33]){
+void *conv(ImageData num, float filter[4][33][33]){
     int num_height = sizeof(num.imgArray)/sizeof(num.imgArray[0]);
     int num_width = sizeof(num.imgArray[0])/sizeof(num.imgArray[0][0]);
 
-    float feature_maps[num_height-filterSize+1][num_width-filterSize+1][4];
+    // float feature_maps[num_height-filterSize+1][num_width-filterSize+1][4];
+    double (*result)[100][100] = new double[4][100][100];
 
+    // double result[4][num_height-32][num_width-32];
     for(int i = 0; i < 4; i++){
         // Real convoluting happen here
-        int result[num_height][num_width];
-        for(int j = 0; j < num_height; j++){
-            for(int k = 0; k < num_width; k++){
-                result[i][j] = 0;
-                // cout << j << endl;
+        // changable for numpy.zeros
+        for(int j = 0; j < num_height-32; j++){
+            for(int k = 0; k < num_width-32; k++){
+                result[i][j][k] = 0;
             }
+            // cout << j << endl;
         }
         // disini tidak ditambah 1
         for(int r = filterSize/2.0; r < num_height-filterSize/2.0; r++){
             for(int c = filterSize/2.0; c < num_width-filterSize/2.0; c++){
-                int curr_region[filterSize][filterSize];
+                double curr_region[filterSize][filterSize];
+                double sum = 0;
                 int filterr = 0;
-                for(int regionr = r-filterSize/2.0; regionr < r+filterSize/2.0-1; regionr++){
+                for(int regionr = r-filterSize/2.0; regionr < r+filterSize/2.0-2; regionr++){
                     int filterc = 0;
-                    for(int regionc = c-filterSize/2.0; regionc < c+filterSize/2.0-1; regionc++){
-                        curr_region[regionr][regionc] = num.imgArray[regionr][regionc] * filter[i][filterr][filterc];
+                    for(int regionc = c-filterSize/2.0; regionc < c+filterSize/2.0-2; regionc++){
+                        // cout << regionr << " " << regionc << " " << filterr << " " << filterc << endl;
+                        // break;
+                        curr_region[filterr][filterc] = num.imgArray[regionr][regionc] * filter[i][filterr][filterc];
+                        sum += curr_region[filterr][filterc];
+                        // cout << curr_region[regionr][regionc] << endl;
                         filterc++;
                     }
+                    filterr++; 
+                    // break;
                 }
-                filterr++;
+                result[i][r-16][c-16] = sum;
+                // break;
             }
+            cout << r << endl;
+            // break;
         }
+        // break;
     }
+    return result;
     // return feature_maps;
 }
