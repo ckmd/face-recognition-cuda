@@ -121,8 +121,8 @@ int main()
 
     // Training start here
     
+    conv(data, map33);
     for(int i=0; i < 1000; i++){
-        conv(data, map33);
         // convolution
         // pooling
         // magnitude
