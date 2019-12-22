@@ -52,4 +52,17 @@ void *conv(ImageData num, double filter[4][33][33]){
     // return feature_maps;
 }
 
-// void *pooling()
+void *pooling(){
+    int stride = 2;
+    int size = 2;
+    int r2 = 0;
+    for(int ro = 0; ro < height-size+1; ro+=stride){
+        int c2 = 0;
+        for(int co = 0; co < width-size+1; co+=stride){
+            pool_out[r2,c2] = max(feature_maps[ro:ro+size, co:co+size]);
+            
+            c2++;
+        }
+    r2++;
+    }
+}
