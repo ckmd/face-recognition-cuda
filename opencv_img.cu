@@ -29,10 +29,10 @@ double randZeroToOne()
 }
 
 struct ImageData { 
-    int imgArray[132][132];
+    double imgArray[132][132];
 };
 
-void *conv(ImageData, float[4][maxMap][maxMap]);
+void *conv(ImageData, double[4][maxMap][maxMap]);
 
 int main()
 {
@@ -83,9 +83,9 @@ int main()
         // converting Mat image into array and add padding 16
         for(int i = 0; i < 132; i++){
             for(int j = 0; j < 132; j++){
-                data.imgArray[i][j] = 128;
+                data.imgArray[i][j] = 0.5;
                 if((i >= 16 && i < grey100.rows + 16) && (j >= 16 && j < grey100.cols + 16))
-                    data.imgArray[i][j] = (int)grey100.at<uchar>(i,j);
+                    data.imgArray[i][j] = (double)grey100.at<uchar>(i-16,j-16) / 255.0;
             }
         }
         labels.push_back(label);
@@ -123,14 +123,14 @@ int main()
     
     for(int i=0; i < datas.size(); i++){
         // convolution
-        double (*convolution)[100][100] = (double (*)[100][100])conv(datas[i], map33i);
+        double (*convolution)[100][100] = (double (*)[100][100])conv(datas[i], map33);
 
-        // for(int j = 0; j < 4; j++){
-        //     Mat A(100,100,CV_64F);
-        //     memcpy(A.data, convolution[j], 100*100*sizeof(double));
-        //     imshow("test", A);
-        //     waitKey(250);
-        // }
+        for(int j = 0; j < 4; j++){
+            Mat A(100,100,CV_64F);
+            memcpy(A.data, convolution[j], 100*100*sizeof(double));
+            imshow("test", A);
+            waitKey(250);
+        }
         cout << i << endl;
         // pooling
         // magnitude

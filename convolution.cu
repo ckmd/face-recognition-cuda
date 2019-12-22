@@ -5,7 +5,7 @@ using namespace std;
 
 const int filterSize = 33;
 
-void *conv(ImageData num, float filter[4][33][33]){
+void *conv(ImageData num, double filter[4][33][33]){
     int num_height = sizeof(num.imgArray)/sizeof(num.imgArray[0]);
     int num_width = sizeof(num.imgArray[0])/sizeof(num.imgArray[0][0]);
 
@@ -51,3 +51,5 @@ void *conv(ImageData num, float filter[4][33][33]){
     return result;
     // return feature_maps;
 }
+
+// void *pooling()
